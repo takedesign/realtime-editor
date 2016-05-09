@@ -11,6 +11,6 @@
   ],
   "dependencies": {
     "express": "^4.13.4",
-    "realtime-editor": "^0.3.2"
+    "realtime-editor": "*"
   }
 }

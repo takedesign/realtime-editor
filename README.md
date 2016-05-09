@@ -26,13 +26,19 @@ Add the client part aswell to your application's index.html
 <script src="node_modules/realtime-editor/realtime-editor.js"></script>
 ```
 
+And dont forget the socket.io client part aswell if you dont have it included allready
+
+```html
+<script src="node_modules/realtime-editor/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+```
+
 
 Usage
 --------
 
 It's currently build around MDL-Lite's material design framework but it should work without it (Dont blame us if doesnt!).
 
-We will add the styles we made for it to work with MDL-Lite later. For now, here is the bare one. Feel free to include your own styles and a label tag inside the div wrapper at the bottom
+For the MDL styles check the example in the dmeo folder. For now, here is the bare one. Feel free to include your own styles and a label tag inside the div wrapper at the bottom
 
 ```html
 <div style="position: relative;">
@@ -42,9 +48,11 @@ We will add the styles we made for it to work with MDL-Lite later. For now, here
 </div>
 ```
 
-Now init the textarea through javascript
+Now init socket.io client part and the the textarea through javascript
 
 ```js
+var socket = io.connect();
+
 var editor = new realtimeEditor(options);
 ```
 
@@ -113,13 +121,16 @@ realtimeEditor.onSave(function (data) {
 ```
 
 
+Demo
+--------
+
+A demo is included. Check it out by cloning the demo folder, go into it and run ```npm install``` followed by a ```node demo.js```
+Open your browser and go to http://localhost:2000 to see the example
+
 Todo
 --------
-* Currently you need to init the textarea with the newest text from the server/db. Would be nice if it auto checks the current server object first
 * Atm you cant write on same line as it updates the text per line
 * More stable version aka. better server testing / fallback
-* Demo included
-* MDL-Lite styles as an option of some sort
 * Undo/redo availability (keyboard shortcuts)
 * More test!
 * Gif demo example.. gotta have those animated gifs!
