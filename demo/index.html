@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+		<meta name="smartSearch" content="0.5.2">
+		<meta class="themeColour" name="theme-color" content="#009688">
+
+		<title>T.A.K.E. Realtime-editor</title>
+
+		<!-- Hosted -->
+		<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,300italic,400italic,500,500italic,700,700italic' type='text/css'>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.teal-red.min.css" />
+
+		<link rel="stylesheet" href="css/demo.css">
+	</head>
+
+	<body ng-app="realtimeEditor" ng-controller="appCtrl">
+		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+			<header class="mdl-layout__header">
+				<div class="mdl-layout__header-row">
+					<span class="mdl-layout-title">Realtime-editor</span>
+					<!-- Add spacer, to align navigation to the right -->
+					<div class="mdl-layout-spacer"></div>
+					<!-- Navigation. We hide it in small screens. -->
+					<nav class="mdl-navigation mdl-layout--large-screen-only">
+						<a class="mdl-navigation__link" href="https://github.com/takedesign/realtime-editor" target="_blank">GitHub</a>
+						<a class="mdl-navigation__link" href="http://takedesign.dk/" target="_blank">T.A.K.E.</a>
+					</nav>
+				</div>
+			</header>
+
+			<div class="mdl-layout__drawer">
+				<span class="mdl-layout-title">Realtime-editor</span>
+				<nav class="mdl-navigation">
+					<a class="mdl-navigation__link" href="https://github.com/takedesign/realtime-editor" target="_blank">GitHub</a>
+					<a class="mdl-navigation__link" href="http://takedesign.dk/" target="_blank">T.A.K.E.</a>
+				</nav>
+			</div>
+
+			<main class="mdl-layout__content">
+				<section class="mdl-grid customGridPlacement">
+					<section class="mdl-cell mdl-cell--6-col mdl-center-cell">
+						<section class="mdl-card mdl-cell mdl-cell--12-col mdl-shadow--4dp">
+							<section class="mdl-card mdl-cell mdl-cell--12-col">
+
+								<div class="realtimeWrapper">
+									<div id="textarea1" class="realtimeEditor is-focused" ondragstart="return false" contenteditable="true" spellcheck="false">
+										<div><br></div>
+									</div>
+									<label class="realtimeLabel">Label text</label>
+								</div>
+
+							</section>
+						</section>
+					</section>
+				</section>
+				
+			</main>
+		</div>
+
+		
+		<footer></footer>
+
+		<!-- Libraries -->
+		<script src="node_modules/realtime-editor/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+		<script src="node_modules/realtime-editor/realtime-editor.js"></script>
+		<script src="js/diff_match_patch.js"></script>
+		<script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+		<!-- custom JavaScript -->
+		<script>
+			var socket = io.connect();
+
+			// componentHandler.upgradeAllRegistered();
+
+			var textarea1 = {
+				id: 'textarea1',
+				//projectId: 70,
+				room: 'project1',
+				text: [
+					{
+						author: 'uniId987',
+						text: 'linje_1',
+						id: '1459856606818_16407750'
+					},
+					{
+						author: 'uniId987',
+						text: 'linje_2',
+						id: '1459865117436_19682870'
+					},
+					{
+						author: 'uniId987',
+						text: 'linje_3',
+						id: '1459865208855_19888940'
+					}
+				],
+				custom: {
+					referenceId: 111,
+					componentId: 222
+				}
+			};
+
+			new realtimeEditor(textarea1);
+		</script>
+	</body>
+</html>

@@ -35,11 +35,11 @@ function realtimeEditor (options) {
 
 	if (options.color === undefined && sessionStorage.tempRealtimeColor === undefined) {
 		sessionStorage.tempRealtimeColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-	}
-	
+	}	
 
 	// set standing variables
 	this.id = options.id;
+	this.text = options.text || this.emptyLine();
 	this.color = options.color || sessionStorage.tempRealtimeColor;
 	this.editor = document.getElementById(options.id);
 	this.projectId = options.projectId || 1;
@@ -48,82 +48,92 @@ function realtimeEditor (options) {
 	this.authorName = options.authorName || sessionStorage.tempRealtimeAuthorName;
 	this.message = options.message || 'Connection lost. please wait..';
 	this.custom = options.custom || {};
+	
+	this.update.bind(this);
 
 	if (socket) {
-		this.editor.addEventListener('focus', this.onFocus.bind(this), false);
-		this.editor.addEventListener('blur', this.onBlur.bind(this), false);
-		this.editor.addEventListener('click', this.onClick.bind(this), false);
-		this.editor.addEventListener('keydown', this.keydown.bind(this), false);
-		this.editor.addEventListener('keyup', this.keyup.bind(this), false);
-		this.editor.addEventListener('paste', this.paste.bind(this), false);
+		socket.emit('rtEditorJoin', {room: that.room, targetId: that.id, projectId: that.projectId, text: that.text}, function (res) {
+			that.text = res.data;
 
-		this.update.bind(this);
-		
-		// check where argumented data needs to be placed
-		if (options.id === this.editor.id && document.activeElement.id !== this.editor.id) {
-			this.editor.innerHTML = '';
+			that.loadText();
+		});
 
-			if (options.text.length > 0) {
-				for (var t = 0; t < options.text.length; t++) {
-					div = document.createElement('div');
+		socket.on('connect', function () {
+			socket.emit('rtEditorRejoin', {room: that.room}, function (res) {
+				var data = {
+					room: that.room,
+					targetId: that.id,
+					projectId: that.projectId,
+					type: 'clearCursor',
+					savedLines: that.getLines()
+				};
 
-					div.id = options.text[t].id;
-					div.innerHTML = options.text[t].text;										
-					
-					this.editor.appendChild(div);
+				that.send(data);
 
-					this.editor.parentNode.classList.add('is-dirty');
-				}
-			} else {
-				// if existing data array is empty insert default empty lines
-				this.insertDefault(this.editor);
-			}
-		}
+				that.editor.style.opacity = 1;
+				that.editor.contentEditable = true;
 
-		socket.emit('rtEditorJoin', {room: this.room});
-		
+				that.toggleMessage('hide');
+			});
+		});
 
 		socket.on('rtEditorBroadcast', function (data) {
 			that.update(data);
 		});
-
-		/*
-		// test af fake disconnect/reconnect
-		setTimeout(function () {
-			that.editor.style.opacity = 0.7;
-			that.editor.contentEditable = false;
-
-			that.toggleMessage();
-		}, 3000);
-
-
-		setTimeout(function () {
-			that.editor.style.opacity = 1;
-			that.editor.contentEditable = true;
-
-			that.toggleMessage();
-		}, 6000);*/
-
+		
 		socket.on('disconnect', function () {
-			console.log('on disconnect', socket);
 			that.editor.style.opacity = 0.7;
 			that.editor.contentEditable = false;
-
-			that.toggleMessage();
+			that.toggleMessage('show');
 		});
 
-		socket.on('connect', function () {
-			console.log('on connect', socket);
-			socket.emit('rtEditorJoin', {room: that.room});
-			that.editor.style.opacity = 1;
-			that.editor.contentEditable = true;
-
-			that.toggleMessage();
-		});
 	} else {
 		console.error('realtimeEditor: socket.io not detected');
 	}
 }
+
+// show the text
+realtimeEditor.prototype.loadText = function () {
+	this.editor.addEventListener('focus', this.onFocus.bind(this), false);
+	this.editor.addEventListener('blur', this.onBlur.bind(this), false);
+	this.editor.addEventListener('click', this.onClick.bind(this), false);
+	this.editor.addEventListener('keydown', this.keydown.bind(this), false);
+	this.editor.addEventListener('keyup', this.keyup.bind(this), false);
+	this.editor.addEventListener('paste', this.paste.bind(this), false);
+	
+	// check if selected field is not active
+	if (document.activeElement.id !== this.editor.id) {
+		this.editor.innerHTML = '';
+
+		if (this.text.length > 0) {
+			for (var t = 0; t < this.text.length; t++) {
+				div = document.createElement('div');
+
+				div.id = this.text[t].id;
+				div.innerHTML = this.text[t].text;										
+				
+				this.editor.appendChild(div);
+
+				this.editor.parentNode.classList.add('is-dirty');
+			}
+		} else {
+			// if existing data array is empty insert default empty lines
+			this.insertDefault(this.editor);
+		}
+	}
+};
+
+// create a new empty line
+realtimeEditor.prototype.emptyLine = function () {
+	return [
+		{
+			author: '',
+			text: '<br>',
+			id: new Date().getTime() + '_' + Math.floor(Math.random() * (2000000 - 0)) + 0
+		}
+	];
+};
+
 
 // on focus add active class
 realtimeEditor.prototype.onFocus = function (event) {
@@ -352,7 +362,6 @@ realtimeEditor.prototype.keyup = function (event) {
 
 	// check deleted lines
 	if (lines.length < this.storedLines.length) {
-		console.log('soemthing was deleted!');
 		for (var s = 0; s < this.storedLines.length; s++) {
 			lineExist = false;
 
@@ -481,9 +490,30 @@ realtimeEditor.prototype.update = function (data) {
 		diff, 
 		patchText, 
 		resultText,
-		data;
+		data,
+		currentTextIndex,
+		previousLineIndex;
 
 	if (target !== null) {
+		/*for (var l = 0; l < this.text.length; l++) {
+			line = this.text[l];
+			
+			// find line to patch
+			if (line.id === data.activeLineId) {
+				currentText = line.text;
+				currentTextIndex = l;
+				//console.log('found currentText to patch', data.activeLineText);
+			}
+
+			// find previous line if any
+			if (line.id === data.previousLineId) {
+				previousLine = line.text;
+				previousLineIndex = l;
+
+				//console.log('found previousLine to fix', data.previousLineText);
+			}
+		}*/
+
 		if (data.type === 'modifyLine') { // patch existing line
 			currentText = line.innerHTML;
 
@@ -492,6 +522,10 @@ realtimeEditor.prototype.update = function (data) {
 			resultText = dmp.patch_apply(patchText, currentText);
 
 			line.innerHTML = resultText[0];
+
+			// data object
+			//this.text[currentTextIndex].text = resultText[0];
+			//this.text[currentTextIndex].author = data.author;
 		} else if (data.type === 'newLine') { // add new line
 			previousLine = document.getElementById(data.previousLineId);
 			div = document.createElement('div');
@@ -499,6 +533,9 @@ realtimeEditor.prototype.update = function (data) {
 			div.innerHTML = data.activeLineText;
 
 			target.insertBefore(div, previousLine.nextSibling);
+
+			// data object
+			
 		} else if (data.type === 'breakLine') {
 			console.log('breakLine', data);
 			previousLine = document.getElementById(data.previousLineId);
@@ -536,7 +573,6 @@ realtimeEditor.prototype.update = function (data) {
 					previousLine = div;
 				}
 			}
-
 		}
 
 
@@ -544,8 +580,9 @@ realtimeEditor.prototype.update = function (data) {
 		if (data.deletedLines) {
 			if (data.deletedLines.length > 0) {
 				this.deletedLines(data);
-			}	
+			}
 		}
+
 
 		// move the recived data's user cursor
 		if (data.type === 'clearCursor') {
@@ -570,7 +607,6 @@ realtimeEditor.prototype.update = function (data) {
 			};
 
 			if (data.caretPos.activeLine !== undefined) {
-				console.log('MOVIT!', data);
 				this.send(data);
 			}
 		}
@@ -665,7 +701,7 @@ realtimeEditor.prototype.hideName = function (event) {
 };
 
 // toggle message upon disconnect
-realtimeEditor.prototype.toggleMessage = function (data) {
+realtimeEditor.prototype.toggleMessage = function (action) {
 	var message = document.getElementById('rtEditor_' + this.id),
 		div;
 
@@ -675,9 +711,13 @@ realtimeEditor.prototype.toggleMessage = function (data) {
 		div.id = 'rtEditor_' + this.id;
 		div.style.font = 'italic 14px Roboto, Helvetica, Arial';
 		div.innerHTML = this.message;
+	}
 
+	if (action === 'show') {
 		this.editor.parentNode.appendChild(div);
 	} else {
-		message.parentNode.removeChild(message);
+		if (message !== null) {
+			message.parentNode.removeChild(message);	
+		}		
 	}
 };

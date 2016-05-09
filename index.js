@@ -34,11 +34,44 @@ realtimeEditor.prototype.init = function () {
 			socket.rtEditor = {
 				room: data.room
 			};
+
+
 			
 			socket.join(data.room, function () {
+				// check if there is a data object allready
+				
+				/*if (that.textarea[data.projectId] !== undefined) {
+					if (that.textarea[data.projectId][data.targetId] !== undefined) {
+
+						data.text = that.textarea[data.projectId][data.targetId].data;
+					}
+				}*/
+
+
+				if (that.textarea[data.projectId] === undefined) {					
+					that.textarea[data.projectId] = {
+						projectId: data.projectId
+					};
+				}
+
+				if (that.textarea[data.projectId][data.targetId] === undefined) {					
+					that.textarea[data.projectId][data.targetId] = {
+						targetId: data.targetId,
+						data: data.text
+					};				
+				}
+
 				if (callback !== undefined) {
-					callback('done joining the room: ' + data.room);	
+					callback({mesage: 'done joining the room: ' + data.room, data: that.textarea[data.projectId][data.targetId].data});
 				}				
+			});
+		});
+
+		socket.on('rtEditorRejoin', function (data, callback) {
+			socket.join(data.room, function () {
+				if (callback !== undefined) {
+					callback({mesage: 'done rejoining the room: ' + data.room, data: data});
+				}
 			});
 		});
 
@@ -48,6 +81,7 @@ realtimeEditor.prototype.init = function () {
 
 	});
 };
+
 
 // emit back to parameter callback
 realtimeEditor.prototype.emit = function (name, data) {

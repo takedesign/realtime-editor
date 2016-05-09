@@ -14,7 +14,7 @@ NOTE: Before we begin, this is a really early beta version and is quite unstable
 
 Setup
 --------
-Npm install the sucker and include it to your server index.js 
+Npm install the sucker and include it to your server index.js
 
 ```js
 var realtimeEditor = require('realtime-editor');

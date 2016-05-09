@@ -1,0 +1,16 @@
+{
+  "name": "realtime-editor-demo",
+  "version": "1.0.0",
+  "description": "A short demo example for realtime-editor",
+  "author": "T.A.K.E.",
+  "contributors": [
+    {
+      "name": "T.A.K.E.",
+      "email": "take@takedesign.dk"
+    }
+  ],
+  "dependencies": {
+    "express": "^4.13.4",
+    "realtime-editor": "^0.3.2"
+  }
+}
