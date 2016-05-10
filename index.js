@@ -1,6 +1,6 @@
 // coEditor
 var emitter = require('events'),
-	socket = require('socket.io'),
+	io = require('socket.io')(http),
 	diffMatchPatch = require('diff-match-patch'),
 	dmp = new diffMatchPatch();
 	
