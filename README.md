@@ -26,7 +26,7 @@ Add the client part aswell to your application's index.html
 <script src="node_modules/realtime-editor/realtime-editor.js"></script>
 ```
 
-And dont forget the socket.io client part aswell if you dont have it included allready
+And dont forget the 2 dependencies socket.io and diff-match-patch client parts aswell if you dont have it included allready
 
 ```html
 <script src="node_modules/realtime-editor/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
@@ -127,6 +127,7 @@ Demo
 A demo is included. Check it out by cloning the demo folder, go into it and run ```npm install``` followed by a ```node demo.js```
 Open your browser and go to http://localhost:2000 to see the example
 
+
 Todo
 --------
 * Atm you cant write on same line as it updates the text per line
@@ -136,3 +137,11 @@ Todo
 * Gif demo example.. gotta have those animated gifs!
 * maybe include text styling in the long run like a WYSIWYG editor
 * did I mention test?
+
+
+Keep making it better
+--------
+Feel free to donate in order to help us out.
+Any amount will be greatly appreciated, for the many hours invested into this, aswell as in future developement.
+
+[![paypal](https://www.paypalobjects.com/da_DK/i/scr/pixel.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WBXRF3VJD2MJY)
