@@ -26,10 +26,11 @@ Add the client part aswell to your application's index.html
 <script src="node_modules/realtime-editor/realtime-editor.js"></script>
 ```
 
-And dont forget the 2 dependencies socket.io and diff-match-patch client parts aswell if you dont have it included allready
+And dont forget the 2 dependencies socket.io and diff-match-patch client parts aswell if you dont have them included allready
 
 ```html
 <script src="node_modules/realtime-editor/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
 ```
 
 
@@ -144,4 +145,4 @@ Keep making it better
 Feel free to donate in order to help us out.
 Any amount will be greatly appreciated, for the many hours invested into this, aswell as in future developement.
 
-[![paypal](https://www.paypalobjects.com/da_DK/i/scr/pixel.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WBXRF3VJD2MJY)
+[![paypal](https://www.paypalobjects.com/en_US/DK/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WBXRF3VJD2MJY)
