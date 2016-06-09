@@ -1,9 +1,12 @@
-// coEditor
+// realtime-editor
+//
+// server side part
+//
+
 var emitter = require('events'),
 	io = require('socket.io')(http),
 	diffMatchPatch = require('diff-match-patch'),
-	dmp = new diffMatchPatch();
-	
+	dmp = new diffMatchPatch();	
 
 
 function realtimeEditor (parameters, custom) {
@@ -29,13 +32,9 @@ realtimeEditor.prototype.init = function () {
 		});
 
 		socket.on('rtEditorJoin', function (data, callback) {
-			console.log('join los roomos:', data.room);
-
 			socket.rtEditor = {
 				room: data.room
 			};
-
-
 			
 			socket.join(data.room, function () {
 				// check if there is a data object allready
@@ -57,7 +56,8 @@ realtimeEditor.prototype.init = function () {
 				if (that.textarea[data.projectId][data.targetId] === undefined) {					
 					that.textarea[data.projectId][data.targetId] = {
 						targetId: data.targetId,
-						data: data.text
+						data: data.text,
+						timeout: 0
 					};				
 				}
 
@@ -76,7 +76,7 @@ realtimeEditor.prototype.init = function () {
 		});
 
 		socket.on('disconnect', function () {
-			console.log('on plugin disconnect', socket.rtEditor);
+			//console.log('on plugin disconnect', socket.rtEditor);
 		});
 
 	});
@@ -95,7 +95,8 @@ realtimeEditor.prototype.syncText = function (data, callback) {
 	//console.log('syncText', data);
 	
 	var line, previousLine, currentText, currentTextIndex, previousLineIndex, loopedLine,
-		diff, patchText, resultText;
+		diff, patchText, resultText,
+		that = this;
 	
 	//console.log('data', data);
 
@@ -252,7 +253,12 @@ realtimeEditor.prototype.syncText = function (data, callback) {
 	callback(data);
 
 	if (data.type !== 'clearCursor' && data.type !== 'moveCursor') {
-		this.emitter.emit('onSave', data);
+		clearTimeout(this.textarea[data.projectId][data.targetId].timeout);
+		
+		// timeout to avoid db spam
+		this.textarea[data.projectId][data.targetId].timeout = setTimeout(function () {
+			that.emitter.emit('onSave', data);
+		}, 700);
 	}	
 };
 

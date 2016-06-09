@@ -60,6 +60,19 @@
 
 							</section>
 						</section>
+
+						<section class="mdl-card mdl-cell mdl-cell--12-col mdl-shadow--4dp">
+							<section class="mdl-card mdl-cell mdl-cell--12-col">
+
+								<div class="realtimeWrapper">
+									<div id="textarea2" class="realtimeEditor is-focused" ondragstart="return false" contenteditable="true" spellcheck="false">
+										<div><br></div>
+									</div>
+									<label class="realtimeLabel">textarea 2</label>
+								</div>
+
+							</section>
+						</section>
 					</section>
 				</section>
 				
@@ -82,7 +95,7 @@
 
 			var textarea1 = {
 				id: 'textarea1',
-				//projectId: 70,
+				projectId: 70,
 				room: 'project1',
 				text: [
 					{
@@ -107,7 +120,30 @@
 				}
 			};
 
+			var textarea2 = {
+				id: 'textarea2',
+				projectId: 72,
+				room: 'project1',
+				text: [
+					{
+						author: 'uniId987',
+						text: 'line1',
+						id: '1459856606818_16403426'
+					},
+					{
+						author: 'uniId175',
+						text: 'line2',
+						id: '1459865117436_16404711'
+					}
+				],
+				custom: {
+					referenceId: 333,
+					componentId: 444
+				}
+			};
+
 			new realtimeEditor(textarea1);
+			new realtimeEditor(textarea2);			
 		</script>
 	</body>
 </html>

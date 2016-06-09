@@ -1,4 +1,8 @@
-// Constructor
+// realtime-editor
+//
+// client side part
+//
+
 function realtimeEditor (options) {
 	var that = this,
 		random = Math.floor((Math.random() * 100000) + 1),
@@ -17,11 +21,17 @@ function realtimeEditor (options) {
 		};
 	}
 
-	// required check
+	// required checks
 	if (options.id === undefined) {
 		console.error('realtimeEditor: textarea id is required');
 
 		return;
+	}
+
+	if (options.text === undefined) {
+		console.error('realtimeEditor: textarea text array is required');
+
+		return;	
 	}
 
 	// temp values
@@ -38,19 +48,21 @@ function realtimeEditor (options) {
 	}	
 
 	// set standing variables
+	this.author = options.author || sessionStorage.tempRealtimeauthor;
+	this.authorName = options.authorName || sessionStorage.tempRealtimeAuthorName;
 	this.id = options.id;
-	this.text = options.text || this.emptyLine();
+	this.text = (options.text.length > 0 ? options.text : this.emptyLine());
 	this.color = options.color || sessionStorage.tempRealtimeColor;
 	this.editor = document.getElementById(options.id);
 	this.projectId = options.projectId || 1;
 	this.room = (options.room === undefined ? (options.projectId + '' + options.id) : options.room);
-	this.author = options.author || sessionStorage.tempRealtimeauthor;
-	this.authorName = options.authorName || sessionStorage.tempRealtimeAuthorName;
+	
 	this.message = options.message || 'Connection lost. please wait..';
 	this.custom = options.custom || {};
 	
 	this.update.bind(this);
 
+	console.log('this.text ' + options.id + ':', this.text);
 	if (socket) {
 		socket.emit('rtEditorJoin', {room: that.room, targetId: that.id, projectId: that.projectId, text: that.text}, function (res) {
 			that.text = res.data;
@@ -76,16 +88,24 @@ function realtimeEditor (options) {
 				that.toggleMessage('hide');
 			});
 		});
-
-		socket.on('rtEditorBroadcast', function (data) {
-			that.update(data);
-		});
 		
-		socket.on('disconnect', function () {
-			that.editor.style.opacity = 0.7;
-			that.editor.contentEditable = false;
-			that.toggleMessage('show');
-		});
+		if (socket.rtEditorBroadcast === undefined) {
+			socket.rtEditorBroadcast = true;
+			socket.on('rtEditorBroadcast', function (data) {
+				that.update(data);
+			});
+		}		
+		
+		if (socket.rtEditorDisconnect === undefined) {
+			socket.rtEditorDisconnect = true;
+			socket.on('disconnect', function () {				
+				console.log('disconnect');
+				that.editor.style.opacity = 0.7;
+				that.editor.contentEditable = false;
+				that.toggleMessage('show');
+			});	
+		}
+		
 
 	} else {
 		console.error('realtimeEditor: socket.io not detected');
@@ -127,13 +147,12 @@ realtimeEditor.prototype.loadText = function () {
 realtimeEditor.prototype.emptyLine = function () {
 	return [
 		{
-			author: '',
+			author: this.author,
 			text: '<br>',
 			id: new Date().getTime() + '_' + Math.floor(Math.random() * (2000000 - 0)) + 0
 		}
 	];
 };
-
 
 // on focus add active class
 realtimeEditor.prototype.onFocus = function (event) {
@@ -153,8 +172,8 @@ realtimeEditor.prototype.onBlur = function (event) {
 	};
 
 	event.target.parentNode.classList.remove('is-focused');
-
-	//this.send(data);
+	
+	this.send(data);
 };
 
 // on click
@@ -537,7 +556,6 @@ realtimeEditor.prototype.update = function (data) {
 			// data object
 			
 		} else if (data.type === 'breakLine') {
-			console.log('breakLine', data);
 			previousLine = document.getElementById(data.previousLineId);
 			div = document.createElement('div');
 			div.id = data.activeLineId;
@@ -586,10 +604,11 @@ realtimeEditor.prototype.update = function (data) {
 
 		// move the recived data's user cursor
 		if (data.type === 'clearCursor') {
-			//document.getElementById('userColor1').style.top = (data.indexLine * 20) + 'px';
 			this.clearCursor(data);	
 		} else {
-			this.moveCursor(data);
+			if (document.getElementById(data.caretPos.activeLineId) !== null) {
+				this.moveCursor(data);
+			}
 		}
 
 		// move the client user cursor
@@ -631,14 +650,14 @@ realtimeEditor.prototype.getLines = function (data) {
 // move cursor
 // data properties required author, caretPos
 realtimeEditor.prototype.moveCursor = function (data) {
-	//console.log('data.caretPos.activeLineId', data.caretPos.activeLineId);
 	var user = document.getElementById(data.author),
-		offsetText = data.savedLines[data.caretPos.lineIndex].text.substr(0, data.caretPos.offset),
+		target = document.getElementById(data.targetId),
+		offsetText = data.savedLines[data.caretPos.lineIndex].text.substr(0, data.caretPos.offset),	
 		computedStyles = window.getComputedStyle(document.getElementById(data.caretPos.activeLineId), null),
 		font = computedStyles.getPropertyValue('font-weight') + ' ' + computedStyles.getPropertyValue('font-size') + ' ' + computedStyles.getPropertyValue('font-family'),
 		name;
 
-	if (user === null) {		
+	if (user === null && target !== null) {		
 		user = document.createElement('span');
 		name = document.createElement('span');
 
@@ -653,7 +672,7 @@ realtimeEditor.prototype.moveCursor = function (data) {
 		name.innerHTML = this.authorName;
 
 		user.appendChild(name);
-		this.editor.appendChild(user);
+		target.appendChild(user);
 
 		user.addEventListener('mouseenter', this.showName, false);
 		user.addEventListener('mouseleave', this.hideName, false);
@@ -717,7 +736,7 @@ realtimeEditor.prototype.toggleMessage = function (action) {
 		this.editor.parentNode.appendChild(div);
 	} else {
 		if (message !== null) {
-			message.parentNode.removeChild(message);	
+			message.parentNode.removeChild(message);
 		}		
 	}
 };
