@@ -4,7 +4,7 @@
 //
 
 var emitter = require('events'),
-	io = require('socket.io')(http),
+	//io = require('socket.io')(http),
 	diffMatchPatch = require('diff-match-patch'),
 	dmp = new diffMatchPatch();	
 
@@ -71,6 +71,14 @@ realtimeEditor.prototype.init = function () {
 			socket.join(data.room, function () {
 				if (callback !== undefined) {
 					callback({mesage: 'done rejoining the room: ' + data.room, data: data});
+				}
+			});
+		});
+
+		socket.on('rtEditorExit', function (data, callback) {
+			socket.leave(data.room, function () {
+				if (callback !== undefined) {
+					callback({mesage: 'done leaving room: ' + data.room, data: data});
 				}
 			});
 		});

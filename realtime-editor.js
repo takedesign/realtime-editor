@@ -53,6 +53,7 @@ function realtimeEditor (options) {
 	this.id = options.id;
 	this.text = (options.text.length > 0 ? options.text : this.emptyLine());
 	this.color = options.color || sessionStorage.tempRealtimeColor;
+	this.lineHeight = options.lineHeight || 20;
 	this.editor = document.getElementById(options.id);
 	this.projectId = options.projectId || 1;
 	this.room = (options.room === undefined ? (options.projectId + '' + options.id) : options.room);
@@ -62,7 +63,6 @@ function realtimeEditor (options) {
 	
 	this.update.bind(this);
 
-	console.log('this.text ' + options.id + ':', this.text);
 	if (socket) {
 		socket.emit('rtEditorJoin', {room: that.room, targetId: that.id, projectId: that.projectId, text: that.text}, function (res) {
 			that.text = res.data;
@@ -99,7 +99,6 @@ function realtimeEditor (options) {
 		if (socket.rtEditorDisconnect === undefined) {
 			socket.rtEditorDisconnect = true;
 			socket.on('disconnect', function () {				
-				console.log('disconnect');
 				that.editor.style.opacity = 0.7;
 				that.editor.contentEditable = false;
 				that.toggleMessage('show');
@@ -185,6 +184,7 @@ realtimeEditor.prototype.onClick = function (event) {
 		projectId: this.projectId,
 		type: 'moveCursor',
 		author: this.author,
+		authorName: this.authorName,
 		savedLines: this.getLines(),
 		caretPos: this.getCaret()
 	};
@@ -664,12 +664,12 @@ realtimeEditor.prototype.moveCursor = function (data) {
 		user.id = data.author;
 		user.className = 'realtimeEditorUser';
 		user.style.cssText = 'position: absolute; background-color: ' + data.color + '; width: 2px; height: 20px; top: 0; left: 0;';
-		user.style.top = (data.caretPos.lineIndex * 20) + 'px';
+		user.style.top = (data.caretPos.lineIndex * this.lineHeight) + 'px';
 		user.style.left = this.getTextWidth(offsetText, font) + 'px';
 		user.contentEditable = false;
 
-		name.style.cssText = 'position: absolute; opacity: 0; transition: 0.2s ease; visibility: hidden; min-width: ' + (this.getTextWidth(this.authorName, 'normal 10px Roboto, Helvetica, Arial') + 5) + 'px; z-index: 1; font-size: 10px; background-color: ' + data.color + '; color: #FFF !important; height: 15px; line-height: 15px; padding-left: 5px; bottom: 20px';
-		name.innerHTML = this.authorName;
+		name.style.cssText = 'position: absolute; opacity: 0; transition: 0.2s ease; visibility: hidden; min-width: ' + (this.getTextWidth(data.authorName, 'normal 10px Roboto, Helvetica, Arial') + 5) + 'px; z-index: 1; font-size: 10px; background-color: ' + data.color + '; color: #FFF !important; height: 15px; line-height: 15px; padding-left: 5px; bottom: 20px';
+		name.innerHTML = data.authorName;
 
 		user.appendChild(name);
 		target.appendChild(user);
@@ -677,7 +677,7 @@ realtimeEditor.prototype.moveCursor = function (data) {
 		user.addEventListener('mouseenter', this.showName, false);
 		user.addEventListener('mouseleave', this.hideName, false);
 	} else {
-		user.style.top = (data.caretPos.lineIndex * 20) + 'px';
+		user.style.top = (data.caretPos.lineIndex * this.lineHeight) + 'px';
 		user.style.left = this.getTextWidth(offsetText, font) + 'px';
 	}
 };
@@ -738,5 +738,17 @@ realtimeEditor.prototype.toggleMessage = function (action) {
 		if (message !== null) {
 			message.parentNode.removeChild(message);
 		}		
+	}
+};
+
+realtimeEditor.prototype.exit = function (room, callback) {
+	if (socket) {
+		socket.emit('rtEditorExit', {room: room}, function (res) {
+			if (callback !== undefined) {
+				callback(res);
+			}
+		});
+	} else {
+		console.error('realtimeEditor: cant leave room, socket.io not detected');
 	}
 };
