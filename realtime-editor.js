@@ -331,7 +331,7 @@ realtimeEditor.prototype.keydown = function (event) {
 
 	if (event.keyCode === 13) {
 		// only adapt if Firefox on enter
-		if (window.navigator.userAgent.indexOf('Firefox') > -1) {
+		if (window.navigator.userAgent.indexOf('Firefox') > -1 || window.navigator.userAgent.indexOf('Edge') > -1) {
 			if (selection.anchorNode.nodeType === 1) {
 				activeLine = selection.anchorNode;
 			} else {
@@ -397,6 +397,7 @@ realtimeEditor.prototype.keyup = function (event) {
 	}
 	
 	// get active line based on caret position
+	
 	if (window.getSelection().anchorNode.nodeType === 1) {
 		activeLine = window.getSelection().anchorNode;
 	} else {
@@ -408,6 +409,10 @@ realtimeEditor.prototype.keyup = function (event) {
 			type = 'newLine';
 		} else {
 			type = 'breakLine';
+
+			if (activeLine.innerHTML === '') {
+				activeLine.innerHTML = '<br>';
+			}
 		}
 
 		if (textarea.parentNode.classList.contains('is-dirty') === false) {
@@ -432,10 +437,9 @@ realtimeEditor.prototype.keyup = function (event) {
 		previousLineId = 'firstLine';
 	} else {
 		previousLineId = previousLine.id;					
-	}	
-	
-	activeLine.id = timeId;
+	}
 
+	activeLine.id = timeId;
 
 	// Check and handle paste content
 	if (this.clipboardData.lines !== undefined) {
