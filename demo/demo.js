@@ -2,7 +2,8 @@
 var express = require('express');
 	app = express(),
 	http = require('http').Server(app),
-	realtimeEditor = require('realtime-editor');
+	io = require('socket.io')(http),
+	realtimeEditor = require('realtime-editor');	
 
 // App routing
 app.get('/', function (req, res) {

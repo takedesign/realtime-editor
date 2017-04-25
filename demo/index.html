@@ -55,7 +55,7 @@
 									<div id="textarea1" class="realtimeEditor is-focused" ondragstart="return false" contenteditable="true" spellcheck="false">
 										<div><br></div>
 									</div>
-									<label class="realtimeLabel">Label text</label>
+									<label class="realtimeLabel">Textarea 1 - Starting with populated data</label>
 								</div>
 
 							</section>
@@ -68,7 +68,7 @@
 									<div id="textarea2" class="realtimeEditor is-focused" ondragstart="return false" contenteditable="true" spellcheck="false">
 										<div><br></div>
 									</div>
-									<label class="realtimeLabel">textarea 2</label>
+									<label class="realtimeLabel">Textarea 2 - Starting with empty data</label>
 								</div>
 
 							</section>
@@ -83,7 +83,7 @@
 		<footer></footer>
 
 		<!-- Libraries -->
-		<script src="node_modules/realtime-editor/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+		<script src="node_modules/socket.io-client/dist/socket.io.min.js"></script>
 		<script src="node_modules/realtime-editor/realtime-editor.js"></script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
@@ -100,17 +100,17 @@
 				text: [
 					{
 						author: 'uniId987',
-						text: 'linje_1',
+						text: 'line_1',
 						id: '1459856606818_16407750'
 					},
 					{
-						author: 'uniId987',
-						text: 'linje_2',
+						author: 'user123',
+						text: 'line_2',
 						id: '1459865117436_19682870'
 					},
 					{
 						author: 'uniId987',
-						text: 'linje_3',
+						text: 'line_3',
 						id: '1459865208855_19888940'
 					}
 				],
@@ -124,18 +124,7 @@
 				id: 'textarea2',
 				projectId: 72,
 				room: 'project1',
-				text: [
-					{
-						author: 'uniId987',
-						text: 'line1',
-						id: '1459856606818_16403426'
-					},
-					{
-						author: 'uniId175',
-						text: 'line2',
-						id: '1459865117436_16404711'
-					}
-				],
+				text: [],
 				custom: {
 					referenceId: 333,
 					componentId: 444

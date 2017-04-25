@@ -17,6 +17,9 @@ Setup
 Npm install the sucker and include it to your server index.js
 
 ```js
+npm install realtime-editor
+```
+```js
 var realtimeEditor = require('realtime-editor');
 ```
 
@@ -29,7 +32,7 @@ Add the client part aswell to your application's index.html
 And dont forget the 2 dependencies socket.io and diff-match-patch client parts aswell if you dont have them included allready
 
 ```html
-<script src="node_modules/realtime-editor/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+<script src="node_modules/socket.io-client/dist/socket.io.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
 ```
 
@@ -39,7 +42,7 @@ Usage
 
 It's currently build around MDL-Lite's material design framework but it should work without it (Dont blame us if doesnt!).
 
-For the MDL styles check the example in the dmeo folder. For now, here is the bare one. Feel free to include your own styles and a label tag inside the div wrapper at the bottom
+For the MDL styles check the example in the demo folder. For now, here is the bare one. Feel free to include your own styles and a label tag inside the div wrapper at the bottom
 
 ```html
 <div style="position: relative;">
@@ -58,7 +61,10 @@ var editor = new realtimeEditor(options);
 ```
 
 The options argument needs atleast the id of the text field aswell as an unique identifier fx a project id.
-It takes several others optional parameters such as an user color
+It takes several others optional parameters such as an user color.
+
+The text property consist of an array with an object for each line created in it. The array can either start empty or with some data (fx. stored from your database).
+The format of the objects inside the text array needs to have the properties as shown below, alltho they are auto generated when new lines are created, but make sure you save the whole text array when storing it to your database.
 
 ```js
 var options = {
@@ -98,7 +104,7 @@ Options
 | Parameter		| Type		| Default		| Description															|
 | ------------- | --------- | ------------- | --------------------------------------------------------------------- |
 | id 			| string	| undefined		| The id of the textarea. Is requried 	|
-| projectId 	| interger 	| 1 			| Will be renamed at some point. is required in order to have multiple editors on same page		|
+| projectId 	| integer 	| 1 			| Will be renamed at some point. is required in order to have multiple editors on same page		|
 | room 			| string	| projectId + id| Room name for socket.io. Make sure its unqiue in order to avoid conflicts. Default is the id of the textarea 	|
 | color 		| string	| random		| Set a user color as such #1d1d1d 	|
 | author 		| string	| random		| Set an id of the user. make sure its unique and no spaces 	|
@@ -135,6 +141,7 @@ Todo
 * More stable version aka. better server testing / fallback
 * Undo/redo availability (keyboard shortcuts)
 * More test!
+* Author text string on an individual line is not getting set correctly atm
 * Gif demo example.. gotta have those animated gifs!
 * maybe include text styling in the long run like a WYSIWYG editor
 * did I mention test?

@@ -26,7 +26,7 @@ realtimeEditor.prototype.init = function () {
 	io.sockets.on('connection', function (socket) {
 
 		socket.on('rtEditorSync', function (data, callback) {
-			that.syncText(data, function (res) {				
+			that.syncText(data, function (res) {
 				socket.broadcast.to(data.room).emit('rtEditorBroadcast', res);
 			});
 		});
@@ -45,6 +45,8 @@ realtimeEditor.prototype.init = function () {
 						data.text = that.textarea[data.projectId][data.targetId].data;
 					}
 				}*/
+
+				//console.log('join room:', data.room);
 
 
 				if (that.textarea[data.projectId] === undefined) {					
@@ -84,7 +86,13 @@ realtimeEditor.prototype.init = function () {
 		});
 
 		socket.on('disconnect', function () {
-			//console.log('on plugin disconnect', socket.rtEditor);
+			/*console.log('on plugin disconnect', socket.rtEditor);
+
+			for (var editor in socket.rtEditor) {
+				console.log('clear cursor from this:', socket.rtEditor[editor]);
+
+				socket.broadcast.to(data.room).emit('rtEditorBroadcast', {});
+			}*/			
 		});
 
 	});
