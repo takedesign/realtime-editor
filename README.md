@@ -6,7 +6,7 @@ If Etherpad are either too big or too much of what you need and shareJS doesnt f
 Here at [T.A.K.E.](http://takedesign.dk/) we have made a very simple "textarea" where the only needs required were to have it be on some sort of collaborative level while not requiring insane amount of server configuration nor external/extra db logic.
 
 
-This realtime-editor is a lightweight node module with a server and client side script. It uses [socket.io](https://www.npmjs.com/package/socket.io) and [diff-match-patch](https://code.google.com/p/google-diff-match-patch/). It doesnt solve all the collaborative problems or needs but if it fits your needs go ahead and use it.
+This realtime-editor is a lightweight node module with a server and client side script. It uses [socket.io](https://www.npmjs.com/package/socket.io) and [diff-match-patch](https://code.google.com/p/google-diff-match-patch/). It doesnt solve all the collaborative problems or needs but if it fits your needs go ahead and give it a try.
 
 
 NOTE: Before we begin, this is a really early beta version and is quite unstable.. more updates and documentations is on its way..
